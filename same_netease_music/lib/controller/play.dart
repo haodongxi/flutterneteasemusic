@@ -46,6 +46,7 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
         .onDurationChanged
         .listen((Duration dutation) {
       print("1111" + dutation.toString());
+      AudioControl.ShareValue().lastUrlCountTime = dutation;
       setState(() {
         _numOfSing = dutation.inSeconds
             .toDouble(); //(dutation.inHours*3600+dutation.inMinutes*60+dutation.inSeconds).toDouble();
@@ -57,7 +58,6 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
         .audioPlayer
         .onAudioPositionChanged
         .listen((Duration dutation) {
-      print("2222" + dutation.toString());
       setState(() {
         _currentNumOfSing = dutation.inSeconds
             .toDouble(); //(dutation.inHours*3600+dutation.inMinutes*60+dutation.inSeconds).toDouble();
@@ -254,7 +254,15 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
                                         backgroundColor: Colors.black,
                                         indicatorColor: Colors.white,
                                         onValueChanged: (ProgressValue value) {
-                                          print(value.toString());
+//                                          print(_numOfSing);
+//                                          print(value.value);
+                                          double seekSecond =
+                                              _numOfSing * value.progress;
+                                          print(seekSecond);
+                                          AudioControl.ShareValue()
+                                              .audioPlayer
+                                              .seek(Duration(
+                                                  seconds: seekSecond.toInt()));
                                         },
                                       ),
                                     ),
@@ -374,6 +382,15 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
         if (AudioControl.ShareValue().playUrl == null ||
             AudioControl.ShareValue().playUrl != _playUrl) {
           AudioControl.ShareValue().play(_playUrl);
+        } else {
+          Duration duration = AudioControl.ShareValue().lastUrlCountTime;
+          if (duration != null) {
+            setState(() {
+              _numOfSing = duration.inSeconds.toDouble();
+              _rightTimeOfSing =
+                  AudioControl.ShareValue().toFormatString(duration);
+            });
+          }
         }
         print('7777....$_playUrl');
       }
