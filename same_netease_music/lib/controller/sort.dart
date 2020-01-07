@@ -12,8 +12,12 @@ class SortPage extends StatefulWidget {
   }
 }
 
-class SortPageState extends State<SortPage> {
+class SortPageState extends State<SortPage> with AutomaticKeepAliveClientMixin {
   List _sortList = List();
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {

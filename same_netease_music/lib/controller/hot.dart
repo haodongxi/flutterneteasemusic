@@ -18,10 +18,14 @@ class HotPage extends StatefulWidget {
   }
 }
 
-class HotPageState extends State<HotPage> {
+class HotPageState extends State<HotPage> with AutomaticKeepAliveClientMixin {
   List<ArtistInfo> _artList = List();
   List<String> _titleList = List();
   Map<String, List> _kindOfArtsMap = Map();
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {

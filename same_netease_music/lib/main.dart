@@ -68,7 +68,8 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>
+    with AutomaticKeepAliveClientMixin {
   List<Tab> _tabList;
   TabController _tabC;
 
@@ -76,6 +77,10 @@ class _MyHomePageState extends State<MyHomePage> {
   List<PersonalizedInfo> _recommandList = List();
   SwiperController _swiperController = SwiperController();
   List<PersonalizedInfo> _recommandSongList = List();
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -98,6 +103,28 @@ class _MyHomePageState extends State<MyHomePage> {
     this._getRecommandFromNet();
     this._getRecommandSongFromNet();
   }
+
+//  @override
+//  Future<void> initState() async {
+//    // TODO: implement initState
+//    super.initState();
+//
+//    _tabC = TabController(length: 3, vsync: ScrollableState());
+//    _tabList = [
+//      Tab(
+//        text: "推荐",
+//      ),
+//      Tab(
+//        text: "排行",
+//      ),
+//      Tab(
+//        text: "歌手",
+//      )
+//    ];
+//    this._getBannerFromNet();
+//    this._getRecommandFromNet();
+//    this._getRecommandSongFromNet();
+//  }
 
   @override
   void dispose() {
