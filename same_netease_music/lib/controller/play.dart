@@ -105,8 +105,13 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
       }
     });
     controller.forward();
+
+    AudioControl.ShareValue().removePlayingTool();
+
     if (widget?.arguments['song']?.ablumInfo?.blurPicUrl == null) {
       _getSongDetailFromNet();
+    } else {
+      AudioControl.ShareValue().currentSongInfo = widget.arguments['song'];
     }
     _getMp3FromNet();
   }
@@ -409,6 +414,7 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
       if (results.length > 0) {
         Map songInfoDict = results[0];
         _currentSongDetail = SongInfo.fromJson(songInfoDict);
+        AudioControl.ShareValue().currentSongInfo = widget.arguments['song'];
         setState(() {});
       }
     }
@@ -416,6 +422,7 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    AudioControl.ShareValue().displayPlayStateToolWidget();
     controller.dispose();
     // TODO: implement dispose
     super.dispose();
