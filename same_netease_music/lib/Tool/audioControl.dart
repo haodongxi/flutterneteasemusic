@@ -23,7 +23,8 @@ class AudioControl {
   Duration lastUrlCountTime;
   SongInfo currentSongInfo;
 
-  AudioPlayer audioPlayer = AudioPlayer();
+  AudioPlayer audioPlayer = AudioPlayer()
+    ..onPlayerStateChanged.listen((AudioPlayerState state) {});
   OverlayEntry _entry = null;
 
   play(url, {isLocal = false, isAsset = false}) async {
@@ -94,85 +95,98 @@ class AudioControl {
       return Positioned(
           bottom: 0,
           left: 0,
-          child: Container(
-              width: MediaQueryData.fromWindow(window).size.width,
-              height: MediaQueryData.fromWindow(window).padding.bottom > 0
-                  ? 90
-                  : 60,
-              color: Colors.white,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(left: 20),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.black,
-                      radius: 25,
-                      backgroundImage: NetworkImage(currentSongInfo == null
-                          ? ""
-                          : currentSongInfo.ablumInfo.blurPicUrl),
-                    ),
-                  ),
-                  Container(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context)
+                  .pushNamed('/play', arguments: {"song": currentSongInfo});
+            },
+            child: Container(
+                width: MediaQueryData.fromWindow(window).size.width,
+                height: MediaQueryData.fromWindow(window).padding.bottom > 0
+                    ? 90
+                    : 60,
+                color: Colors.white,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
                       margin: EdgeInsets.only(left: 20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                              width: 150,
-                              child: Text(
-                                currentSongInfo == null
-                                    ? ""
-                                    : currentSongInfo.name,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  decoration: TextDecoration.none,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 16,
-                                ),
-                              )),
-                          Container(
-                              width: 150,
-                              child: Text(
-                                currentSongInfo == null
-                                    ? ""
-                                    : currentSongInfo.artNames,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  decoration: TextDecoration.none,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14,
-                                ),
-                              )),
-                        ],
-                      )),
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.topRight,
-                      child: Container(
-                          margin: EdgeInsets.only(right: 20, top: 5),
-                          height: 50,
-                          width: 50,
-                          child: GestureDetector(
-                            onTap: () {
-                              if (state == AudioPlayerState.PLAYING) {
-                                audioPlayer.pause();
-                              } else {
-                                audioPlayer.play(playUrl);
-                              }
-                              displayPlayStateToolWidget();
-                            },
-                            child: Icon(
-                              state == AudioPlayerState.PLAYING
-                                  ? Icons.pause_circle_filled
-                                  : Icons.play_circle_outline,
-                              size: 40,
-                            ),
-                          )),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.black,
+                        radius: 25,
+                        backgroundImage: NetworkImage(currentSongInfo == null
+                            ? ""
+                            : currentSongInfo.ablumInfo.blurPicUrl),
+                      ),
                     ),
-                  )
-                ],
-              )));
+                    Container(
+                        margin: EdgeInsets.only(left: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                                width: 150,
+                                child: Text(
+                                  currentSongInfo == null
+                                      ? ""
+                                      : currentSongInfo.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    decoration: TextDecoration.none,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 16,
+                                  ),
+                                )),
+                            Container(
+                                width: 150,
+                                child: Text(
+                                  currentSongInfo == null
+                                      ? ""
+                                      : currentSongInfo.artNames,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    decoration: TextDecoration.none,
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 14,
+                                  ),
+                                )),
+                          ],
+                        )),
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.topRight,
+                        child: Container(
+                            margin: EdgeInsets.only(right: 20, top: 5),
+                            height: 50,
+                            width: 50,
+                            child: GestureDetector(
+                              onTap: () {
+                                if (state == AudioPlayerState.PLAYING) {
+                                  audioPlayer.pause().then((value) {
+                                    if (value == 1) {
+                                      displayPlayStateToolWidget();
+                                    }
+                                  });
+                                } else {
+                                  audioPlayer.resume().then((value) {
+                                    if (value == 1) {
+                                      displayPlayStateToolWidget();
+                                    }
+                                  });
+                                }
+                              },
+                              child: Icon(
+                                state == AudioPlayerState.PLAYING
+                                    ? Icons.pause_circle_filled
+                                    : Icons.play_circle_outline,
+                                size: 40,
+                              ),
+                            )),
+                      ),
+                    )
+                  ],
+                )),
+          ));
     });
 //往Overlay中插入插入OverlayEntry
     Overlay.of(ContextTool.shareValue().context).insert(_entry);

@@ -161,6 +161,7 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
                                 icon: Icon(Icons.arrow_back_ios),
                                 color: Colors.white,
                                 onPressed: () {
+                                  print("play pop");
                                   Navigator.of(context).pop();
                                 }),
                             Center(
@@ -421,8 +422,16 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
   }
 
   @override
+  void deactivate() {
+    Future.delayed(Duration(seconds: 1)).then((value) {
+      AudioControl.ShareValue().displayPlayStateToolWidget();
+    });
+    // TODO: implement deactivate
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
-    AudioControl.ShareValue().displayPlayStateToolWidget();
     controller.dispose();
     // TODO: implement dispose
     super.dispose();
