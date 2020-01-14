@@ -7,9 +7,7 @@ import '../model/SongInfo.dart';
 
 class AudioControl {
   static AudioControl _value = AudioControl._();
-
   AudioControl._();
-
   factory AudioControl.ShareValue() {
     return _value;
   }
@@ -20,6 +18,7 @@ class AudioControl {
   int minutesPerHour = 60;
   int hoursPerDay = 24;
   String playUrl;
+  int songId;
   Duration lastUrlCountTime;
   SongInfo currentSongInfo;
 
@@ -27,11 +26,16 @@ class AudioControl {
     ..onPlayerStateChanged.listen((AudioPlayerState state) {});
   OverlayEntry _entry = null;
 
-  play(url, {isLocal = false, isAsset = false}) async {
+  play(url, id, {isLocal = false, isAsset = false}) async {
     playUrl = url;
+    songId = id;
     int result = await audioPlayer.play(url, isLocal: isLocal);
     if (result == 1) {
-//      _setPlayStateToolWidget();
+      audioPlayer.onPlayerStateChanged.listen((AudioPlayerState state) {
+        if (_entry != null) {
+          displayPlayStateToolWidget();
+        }
+      });
       // success
     }
   }
@@ -164,15 +168,23 @@ class AudioControl {
                                 if (state == AudioPlayerState.PLAYING) {
                                   audioPlayer.pause().then((value) {
                                     if (value == 1) {
-                                      displayPlayStateToolWidget();
+//                                      displayPlayStateToolWidget();
                                     }
                                   });
                                 } else {
-                                  audioPlayer.resume().then((value) {
-                                    if (value == 1) {
-                                      displayPlayStateToolWidget();
-                                    }
-                                  });
+                                  if (state == AudioPlayerState.COMPLETED) {
+                                    audioPlayer.play(playUrl).then((value) {
+                                      if (value == 1) {
+//                                        displayPlayStateToolWidget();
+                                      }
+                                    });
+                                  } else {
+                                    audioPlayer.resume().then((value) {
+                                      if (value == 1) {
+//                                        displayPlayStateToolWidget();
+                                      }
+                                    });
+                                  }
                                 }
                               },
                               child: Icon(

@@ -11,6 +11,7 @@ import '../Tool/audioControl.dart';
 import 'package:dio/dio.dart';
 import '../model/PersonalizedInfo.dart';
 import '../Tool/contextTool.dart';
+import 'dart:async';
 
 class PlayPage extends StatefulWidget {
   Map arguments;
@@ -36,37 +37,38 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
   AnimationController controller;
   SongInfo _currentSongDetail;
 
+  List<StreamSubscription> streamSubscriptionList = List();
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    AudioControl.ShareValue()
+    StreamSubscription durationStreamSubscription = AudioControl.ShareValue()
         .audioPlayer
         .onDurationChanged
         .listen((Duration dutation) {
       print("1111" + dutation.toString());
       AudioControl.ShareValue().lastUrlCountTime = dutation;
       setState(() {
-        _numOfSing = dutation.inSeconds
-            .toDouble(); //(dutation.inHours*3600+dutation.inMinutes*60+dutation.inSeconds).toDouble();
+        _numOfSing = dutation.inSeconds.toDouble();
         _rightTimeOfSing = AudioControl.ShareValue().toFormatString(dutation);
+        print('111总' + _numOfSing.toString());
       });
     });
 
-    AudioControl.ShareValue()
+    StreamSubscription positionStreamSubscription = AudioControl.ShareValue()
         .audioPlayer
         .onAudioPositionChanged
         .listen((Duration dutation) {
       setState(() {
-        _currentNumOfSing = dutation.inSeconds
-            .toDouble(); //(dutation.inHours*3600+dutation.inMinutes*60+dutation.inSeconds).toDouble();
+        _currentNumOfSing = dutation.inSeconds.toDouble();
         _leftCurrentTimeOfSing =
             AudioControl.ShareValue().toFormatString(dutation);
       });
     });
 
-    AudioControl.ShareValue()
+    StreamSubscription stateStreamSubscription = AudioControl.ShareValue()
         .audioPlayer
         .onPlayerStateChanged
         .listen((AudioPlayerState state) {
@@ -75,10 +77,15 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
         _playState = state;
       });
     });
-
-    AudioControl.ShareValue().audioPlayer.onSeekComplete.listen((_) {
+    StreamSubscription seekStreamSubscription =
+        AudioControl.ShareValue().audioPlayer.onSeekComplete.listen((_) {
       print("4444");
     });
+
+    streamSubscriptionList.add(durationStreamSubscription);
+    streamSubscriptionList.add(stateStreamSubscription);
+    streamSubscriptionList.add(seekStreamSubscription);
+    streamSubscriptionList.add(positionStreamSubscription);
 
     _playState = AudioControl.ShareValue().audioPlayer.state;
 
@@ -260,11 +267,8 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
                                         backgroundColor: Colors.black,
                                         indicatorColor: Colors.white,
                                         onValueChanged: (ProgressValue value) {
-//                                          print(_numOfSing);
-//                                          print(value.value);
                                           double seekSecond =
                                               _numOfSing * value.progress;
-                                          print(seekSecond);
                                           AudioControl.ShareValue()
                                               .audioPlayer
                                               .seek(Duration(
@@ -321,13 +325,16 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
                                           if (AudioControl.ShareValue()
                                                   .playUrl ==
                                               null) {
-                                            AudioControl.ShareValue()
-                                                .play(_playUrl);
-                                          } else if (_playUrl !=
+                                            AudioControl.ShareValue().play(
+                                                _playUrl,
+                                                widget.arguments['song'].id);
+                                          } else if (widget
+                                                  .arguments['song'].id !=
                                               AudioControl.ShareValue()
-                                                  .playUrl) {
-                                            AudioControl.ShareValue()
-                                                .play(_playUrl);
+                                                  .songId) {
+                                            AudioControl.ShareValue().play(
+                                                _playUrl,
+                                                widget.arguments['song'].id);
                                           } else {
                                             if (_playState ==
                                                 AudioPlayerState.PLAYING) {
@@ -337,8 +344,9 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
                                               AudioControl.ShareValue()
                                                   .resume(_playUrl);
                                             } else {
-                                              AudioControl.ShareValue()
-                                                  .play(_playUrl);
+                                              AudioControl.ShareValue().play(
+                                                  _playUrl,
+                                                  widget.arguments['song'].id);
                                             }
                                           }
                                         }
@@ -386,8 +394,8 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
       if (results.length > 0) {
         _playUrl = results[0]['url'];
         if (AudioControl.ShareValue().playUrl == null ||
-            AudioControl.ShareValue().playUrl != _playUrl) {
-          AudioControl.ShareValue().play(_playUrl);
+            AudioControl.ShareValue().songId != widget.arguments['song'].id) {
+          AudioControl.ShareValue().play(_playUrl, widget.arguments['song'].id);
         } else {
           Duration duration = AudioControl.ShareValue().lastUrlCountTime;
           if (duration != null) {
@@ -433,7 +441,13 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     controller.dispose();
+
+    for (StreamSubscription sub in streamSubscriptionList) {
+      print('取消');
+      sub.cancel();
+    }
     // TODO: implement dispose
+    print("play dispose");
     super.dispose();
   }
 }
