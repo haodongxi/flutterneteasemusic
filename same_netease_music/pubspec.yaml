@@ -32,6 +32,8 @@ dependencies:
   cupertino_icons: ^0.1.2
   extended_image: ^0.6.8
   lpinyin: ^1.0.7
+  shared_preferences: ^0.5.6
+  sqflite: ^1.2.0
 
 dev_dependencies:
   flutter_test:
