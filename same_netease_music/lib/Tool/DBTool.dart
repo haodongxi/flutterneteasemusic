@@ -6,7 +6,7 @@ class DBTool {
   String dbPath;
   Database database;
 
-  Future<Database> getDBPath() async {
+  Future<Database> OpenKeyValueDB() async {
     var databasesPath = await getDatabasesPath();
     dbPath = join(databasesPath, 'netease.db');
     return await _createKeyValueTable();
@@ -22,42 +22,78 @@ class DBTool {
     return database;
   }
 
-  addValueForKey(String key, String value) async {
+  Future addValueForKey(String key, String value) async {
     List<Map> list =
         await database.rawQuery('SELECT * FROM KeyValue WHERE key=?', [key]);
     if (list == null || list.length == 0) {
-      await database.transaction((txn) async {
-        await txn.rawInsert(
+      return await database.transaction((txn) async {
+        int row = await txn.rawInsert(
             'INSERT INTO KeyValue(key, value) VALUES("$key", "$value")');
+        return row;
       });
     } else {
-      await database.rawUpdate(
+      return await database.rawUpdate(
           'UPDATE KeyValue SET value = ? WHERE key = ?', [value, key]);
     }
   }
 
   Future<List> getValueWithKey(String key) async {
-    print(3);
-    Future<List> values = await _getAsynDB(key);
-    print(values ?? 5);
-    return values;
+    List<Map> list =
+        await database.rawQuery('SELECT * FROM KeyValue WHERE key=?', [key]);
+    return list;
   }
 
-  deleteValueForKey(String key) async {
-    await database.rawDelete('DELETE FROM KeyValue WHERE key = ?', [key]);
+  Future deleteValueForKey(String key) async {
+    return await database
+        .rawDelete('DELETE FROM KeyValue WHERE key = ?', [key]);
   }
 
-  getAllValue() async {
+  Future getAllValue() async {
     List<Map> list = await database.rawQuery('SELECT * FROM KeyValue');
     return list;
   }
 
-  _getAsynDB(String key) async {
-    print(4.toString() + key);
-    return await database.rawQuery('SELECT * FROM KeyValue WHERE key=?', [key]);
+  Future<Database> OpenHistoryDB() async {
+    var databasesPath = await getDatabasesPath();
+    dbPath = join(databasesPath, 'netease.db');
+    return await _createHistoryTable();
   }
 
-  closeDB() async {
-    await database?.close();
+  Future _createHistoryTable() async {
+    // open the database
+    return database = await openDatabase(dbPath, version: 1,
+        onCreate: (Database db, int version) async {
+      await db.execute(
+          'CREATE TABLE IF NOT EXISTS SearchHistory (searchName TEXT)');
+      return database;
+    });
+  }
+
+  Future addHistoryForName(String name) async {
+    List<Map> list = await database
+        .rawQuery('SELECT * FROM SearchHistory WHERE searchName=?', [name]);
+    if (list == null || list.length == 0) {
+      return await database.transaction((txn) async {
+        int row = await txn
+            .rawInsert('INSERT INTO SearchHistory(searchName) VALUES("$name")');
+        return row;
+      });
+    } else {
+      return null;
+    }
+  }
+
+  Future deleteHistoryForName(String name) async {
+    return await database
+        .rawDelete('DELETE FROM SearchHistory WHERE searchName = ?', [name]);
+  }
+
+  Future getAllHistory() async {
+    List<Map> list = await database.rawQuery('SELECT * FROM SearchHistory');
+    return list;
+  }
+
+  Future closeDB() async {
+    return await database?.close();
   }
 }

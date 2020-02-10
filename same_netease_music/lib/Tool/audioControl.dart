@@ -118,9 +118,10 @@ class AudioControl {
                       child: CircleAvatar(
                         backgroundColor: Colors.black,
                         radius: 25,
-                        backgroundImage: NetworkImage(currentSongInfo == null
-                            ? ""
-                            : currentSongInfo.ablumInfo.blurPicUrl),
+                        backgroundImage: NetworkImage(
+                            currentSongInfo?.ablumInfo?.blurPicUrl == null
+                                ? ""
+                                : currentSongInfo.ablumInfo.blurPicUrl),
                       ),
                     ),
                     Container(

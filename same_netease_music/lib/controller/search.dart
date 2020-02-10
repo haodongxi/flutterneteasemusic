@@ -7,6 +7,7 @@ import '../model/SearchHotInfo.dart';
 import '../model/SongInfo.dart';
 import '../model/ArtistInfo.dart';
 import 'package:dio/dio.dart';
+import '../Tool/DBTool.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -24,6 +25,7 @@ class searchState extends State<SearchPage> {
   OverlayEntry _entry;
   TextEditingController _editingController;
   bool _isClickHotBtn = false;
+  List _historyList = List();
   @override
   void initState() {
     super.initState();
@@ -37,6 +39,7 @@ class searchState extends State<SearchPage> {
         }
       });
     _getHotFromNet();
+    _getHistory();
   }
 
   @override
@@ -129,6 +132,7 @@ class searchState extends State<SearchPage> {
                         },
                         child: Container(
                           padding: EdgeInsets.all(2.0),
+                          height: 25,
                           decoration: BoxDecoration(
                             border: Border.all(
                               width: 0.5,
@@ -169,7 +173,7 @@ class searchState extends State<SearchPage> {
               child: ListView.builder(
                 itemExtent: 30,
                 padding: EdgeInsets.all(0),
-                itemCount: _searchHotList.length,
+                itemCount: _historyList.length,
                 itemBuilder: (BuildContext context, index) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -180,7 +184,7 @@ class searchState extends State<SearchPage> {
                           left: 20,
                         ),
                         child: Text(
-                          _searchHotList[index].first,
+                          _historyList[index],
                           style: TextStyle(fontSize: 14),
                         ),
                       ),
@@ -190,7 +194,18 @@ class searchState extends State<SearchPage> {
                           ),
                           child: IconButton(
                               icon: Icon(Icons.delete_forever),
-                              onPressed: null)),
+                              onPressed: () {
+                                DBTool dbTool = DBTool();
+                                dbTool.OpenHistoryDB().then((database) {
+                                  if (database != null) {
+                                    String name = _historyList[index];
+                                    dbTool.deleteHistoryForName(name);
+                                    setState(() {
+                                      _historyList.remove(name);
+                                    });
+                                  }
+                                });
+                              })),
                     ],
                   );
                 },
@@ -259,6 +274,23 @@ class searchState extends State<SearchPage> {
     }
   }
 
+  _getHistory() {
+    DBTool dbTool = DBTool();
+    dbTool.OpenHistoryDB().then((database) {
+      if (database != null) {
+        dbTool.getAllHistory().then((list) {
+          if (list != null) {
+            _historyList.clear();
+            for (Map dict in list) {
+              _historyList.add(dict['searchName']);
+            }
+            setState(() {});
+          }
+        });
+      }
+    });
+  }
+
   _searchlistWidget(BuildContext context) {
     _removeEntry();
     //判断是否需要显示
@@ -302,8 +334,19 @@ class searchState extends State<SearchPage> {
                               SongInfo info = _searchList[index];
                               return GestureDetector(
                                 onTap: () {
-                                  _removeEntry();
+                                  DBTool dbtool = DBTool();
+                                  String tmpName = info.name;
+                                  dbtool.OpenHistoryDB().then((database) {
+                                    if (database != null) {
+                                      dbtool
+                                          .addHistoryForName(tmpName)
+                                          .then((value) {
+                                        _getHistory();
+                                      });
+                                    }
+                                  });
                                   _editingController.text = "";
+                                  _removeEntry();
                                   Navigator.of(context).pushNamed('/play',
                                       arguments: {"song": info});
                                 },

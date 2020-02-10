@@ -423,7 +423,7 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
       if (results.length > 0) {
         Map songInfoDict = results[0];
         _currentSongDetail = SongInfo.fromJson(songInfoDict);
-        AudioControl.ShareValue().currentSongInfo = widget.arguments['song'];
+        AudioControl.ShareValue().currentSongInfo = _currentSongDetail;
         setState(() {});
       }
     }
