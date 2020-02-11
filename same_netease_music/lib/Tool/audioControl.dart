@@ -87,8 +87,8 @@ class AudioControl {
   removePlayingTool() {
     if (_entry != null) {
       _entry.remove();
-      _entry = null;
     }
+    _entry = null;
   }
 
   displayPlayStateToolWidget() {

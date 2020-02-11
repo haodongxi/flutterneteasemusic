@@ -44,174 +44,204 @@ class searchState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: MediaQueryData.fromWindow(window).size.width,
-        height: double.infinity,
-        alignment: Alignment.topLeft,
-        color: Colors.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              height: MediaQueryData.fromWindow(window).padding.top + 50,
-              color: Colors.red,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(
-                        top: MediaQueryData.fromWindow(window).padding.top),
-                    child: IconButton(
-                        icon: Icon(Icons.arrow_back_ios),
-                        iconSize: 24,
-                        color: Colors.white,
-                        padding: EdgeInsets.only(bottom: 10),
-                        onPressed: () {
-                          _removeEntry();
-                          Navigator.of(context).pop();
-                        }),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(bottom: 7),
-                    height: 40,
-                    width:
-                        MediaQueryData.fromWindow(window).size.width - 48 * 2,
-                    child: CupertinoTextField(
-                      controller: _editingController,
-                      cursorColor: Colors.white,
-                      placeholderStyle: TextStyle(color: Colors.white),
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                      placeholder: '搜索歌曲、歌手',
-                      // cursorRadius: ,
-                      decoration: BoxDecoration(
-                          border: Border(
-                              bottom:
-                                  BorderSide(width: 0.4, color: Colors.white))),
-                    ),
-                  ),
-                  _isDisplayCloseButton == false
-                      ? Container()
-                      : IconButton(
-                          icon: Icon(
-                            Icons.close,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            _removeEntry();
-                          },
-                        )
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
-              child: Text(
-                '热门搜索',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-            ),
-            Container(
-                color: Colors.white,
-                padding: EdgeInsets.only(left: 20, right: 10),
-                width: MediaQueryData.fromWindow(window).size.width,
-                child: Wrap(
-                    spacing: 5,
-                    runSpacing: 5,
-                    children: List.generate(_searchHotList.length, (index) {
-                      return GestureDetector(
-                        onTap: () {
-                          _isClickHotBtn = true;
-                          _removeEntry();
-                          _searchkeyWordsFromNet(
-                              _searchHotList[index].first, context);
-//                          _suggestkeyWordsFromNet(
-//                              _searchHotList[index].first, context);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(2.0),
-                          height: 25,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 0.5,
-                              color: Colors.grey,
-                            ),
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                          child: Text(_searchHotList[index].first),
-                        ),
-                      );
-                    }))),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
+    return Center(
+      child: Scaffold(
+        body: Container(
+          width: MediaQueryData.fromWindow(window).size.width,
+          height: double.infinity,
+          alignment: Alignment.topLeft,
+          color: Colors.white,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.only(
-                    left: 20,
-                    top: 20,
+                  height: MediaQueryData.fromWindow(window).padding.top + 50,
+                  color: Colors.red,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(
+                            top: MediaQueryData.fromWindow(window).padding.top),
+                        child: IconButton(
+                            icon: Icon(Icons.arrow_back_ios),
+                            iconSize: 24,
+                            color: Colors.white,
+                            padding: EdgeInsets.only(bottom: 10),
+                            onPressed: () {
+                              _removeEntry();
+                              Navigator.of(context).pop();
+                            }),
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(
+                              bottom: 10,
+                              top: MediaQueryData.fromWindow(window)
+                                  .padding
+                                  .top), //EdgeInsets.only(top: 10),
+                          height: 40,
+                          width: MediaQueryData.fromWindow(window).size.width -
+                              48 * 2,
+                          child: CupertinoTextField(
+                            controller: _editingController,
+                            cursorColor: Colors.white,
+                            placeholderStyle: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                            placeholder: '搜索歌曲、歌手',
+                            // cursorRadius: ,
+                            decoration: BoxDecoration(
+                                border: Border(bottom: BorderSide.none
+//                                    bottom: BorderSide(
+//                                        width: 0.4, color: Colors.white)
+                                    )),
+                          ),
+                        ),
+                      ),
+                      _isDisplayCloseButton == false
+                          ? Container()
+                          : IconButton(
+                              icon: Icon(
+                                Icons.close,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                _removeEntry();
+                              },
+                            )
+                    ],
                   ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
                   child: Text(
-                    '搜索历史',
+                    '热门搜索',
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ),
                 Container(
-                    padding: EdgeInsets.only(
-                      left: 20,
-                      top: 20,
+                    color: Colors.white,
+                    padding: EdgeInsets.only(left: 20, right: 10),
+                    width: MediaQueryData.fromWindow(window).size.width,
+                    child: Wrap(
+                        spacing: 5,
+                        runSpacing: 5,
+                        children: List.generate(_searchHotList.length, (index) {
+                          return GestureDetector(
+                            onTap: () {
+                              _isClickHotBtn = true;
+                              _removeEntry();
+                              _searchkeyWordsFromNet(
+                                  _searchHotList[index].first, context);
+//                          _suggestkeyWordsFromNet(
+//                              _searchHotList[index].first, context);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(2.0),
+                              height: 25,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  width: 0.5,
+                                  color: Colors.grey,
+                                ),
+                                borderRadius: BorderRadius.circular(2.0),
+                              ),
+                              child: Text(_searchHotList[index].first),
+                            ),
+                          );
+                        }))),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(
+                        left: 20,
+                        top: 20,
+                      ),
+                      child: Text(
+                        '搜索历史',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
                     ),
-                    child:
-                        IconButton(icon: Icon(Icons.delete), onPressed: null)),
-              ],
-            ),
-            Expanded(
-                child: Container(
-              width: MediaQueryData.fromWindow(window).size.width,
-              child: ListView.builder(
-                itemExtent: 30,
-                padding: EdgeInsets.all(0),
-                itemCount: _historyList.length,
-                itemBuilder: (BuildContext context, index) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      Container(
+                    Container(
                         padding: EdgeInsets.only(
                           left: 20,
+                          top: 20,
                         ),
-                        child: Text(
-                          _historyList[index],
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ),
-                      Container(
-                          padding: EdgeInsets.only(
-                            left: 20,
+                        child: IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              DBTool dbTool = DBTool();
+                              dbTool.OpenHistoryDB().then((database) {
+                                if (database != null) {
+                                  dbTool.clearHistroy();
+                                }
+                              });
+                              setState(() {
+                                _historyList.clear();
+                              });
+                            })),
+                  ],
+                ),
+                Expanded(
+                    child: Container(
+                  width: MediaQueryData.fromWindow(window).size.width,
+                  child: ListView.builder(
+                    itemExtent: 30,
+                    padding: EdgeInsets.all(0),
+                    itemCount: _historyList.length,
+                    itemBuilder: (BuildContext context, index) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () {
+                              _isClickHotBtn = true;
+                              _removeEntry();
+                              _searchkeyWordsFromNet(
+                                  _historyList[index], context);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                left: 20,
+                              ),
+                              child: Text(
+                                _historyList[index],
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ),
                           ),
-                          child: IconButton(
-                              icon: Icon(Icons.delete_forever),
-                              onPressed: () {
-                                DBTool dbTool = DBTool();
-                                dbTool.OpenHistoryDB().then((database) {
-                                  if (database != null) {
-                                    String name = _historyList[index];
-                                    dbTool.deleteHistoryForName(name);
-                                    setState(() {
-                                      _historyList.remove(name);
+                          Container(
+                              padding: EdgeInsets.only(
+                                left: 20,
+                              ),
+                              child: IconButton(
+                                  icon: Icon(Icons.delete_forever),
+                                  onPressed: () {
+                                    DBTool dbTool = DBTool();
+                                    dbTool.OpenHistoryDB().then((database) {
+                                      if (database != null) {
+                                        String name = _historyList[index];
+                                        dbTool.deleteHistoryForName(name);
+                                        setState(() {
+                                          _historyList.remove(name);
+                                        });
+                                      }
                                     });
-                                  }
-                                });
-                              })),
-                    ],
-                  );
-                },
-              ),
-            )),
-          ],
+                                  })),
+                        ],
+                      );
+                    },
+                  ),
+                )),
+              ],
+            ),
+          ),
         ),
       ),
     );

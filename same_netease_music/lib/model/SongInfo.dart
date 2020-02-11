@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'AblumInfo.dart';
 import 'ArtistInfo.dart';
+import 'dart:convert' as convert;
 
 class SongInfo {
   String name;
@@ -51,5 +53,22 @@ class SongInfo {
     }
 
     return info;
+  }
+
+  String modelToJsonStr() {
+    Map json = {'id': id, 'name': name};
+    List artistList = List();
+    for (ArtistInfo info in arts) {
+      Map tempArtInfo = {
+        "name": info.name,
+        "picUrl": info.picUrl,
+        "id": info.id
+      };
+      artistList.add(tempArtInfo);
+    }
+    json['artists'] = artistList;
+    String doneJsonStr = convert.jsonEncode(json);
+    print(doneJsonStr);
+    return doneJsonStr;
   }
 }

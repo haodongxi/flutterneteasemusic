@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import "../model/SongInfo.dart";
+import '../Tool/DBTool.dart';
+import 'dart:convert' as convert;
+
 class MorePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -11,6 +15,7 @@ class MorePage extends StatefulWidget {
 class MorePageState extends State<MorePage> {
   List<Tab> _tabList;
   TabController _tabC;
+  List<SongInfo> _currentPlayList = List();
   @override
   void initState() {
     // TODO: implement initState
@@ -24,6 +29,8 @@ class MorePageState extends State<MorePage> {
       ),
     ];
     _tabC = TabController(length: 2, vsync: ScrollableState());
+
+    _getCurrentPlayList();
   }
 
   @override
@@ -98,7 +105,7 @@ class MorePageState extends State<MorePage> {
                                 style: TextStyle(fontSize: 15),
                               ),
                               Text(
-                                "(共2首)",
+                                "(共${_currentPlayList.length}首)",
                                 style:
                                     TextStyle(fontSize: 13, color: Colors.grey),
                               ),
@@ -117,56 +124,75 @@ class MorePageState extends State<MorePage> {
                             alignment: Alignment.topLeft,
                             child: ListView.builder(
                                 padding: EdgeInsets.only(top: 0),
-                                itemCount: 2,
+                                itemCount: _currentPlayList.length,
                                 itemBuilder: (BuildContext context, int index) {
-                                  return Container(
-                                    width: MediaQueryData.fromWindow(window)
-                                        .size
-                                        .width,
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      border:Border(bottom: BorderSide(width: 0.2,color: Colors.grey))
-                                    ),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Container(
-                                          width:20,
-                                          margin: EdgeInsets.only(left: 20),
-                                          child: Text('${index+1}'),
-                                        ),
-                                        Container(
-                                          height:60,
-                                          width: MediaQueryData.fromWindow(window).size.width-100,
-                                          margin: EdgeInsets.only(left: 10),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Container(
-                                                margin: EdgeInsets.only(top: 7),
-                                                height: 25,
-                                                child: Text(
-                                                  '我和我的祖国',
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                  ),
-                                                  overflow:TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              Container(
-                                                height: 25,
-                                                child: Text(
-                                                  '王菲',
-                                                  style: TextStyle(
-                                                      fontSize: 13,
-                                                      color: Colors.grey
-                                                  ),
-                                                ),
-                                              )
-                                            ],
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed('/play',
+                                          arguments: {
+                                            "song": _currentPlayList[index]
+                                          });
+                                    },
+                                    child: Container(
+                                      width: MediaQueryData.fromWindow(window)
+                                          .size
+                                          .width,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  width: 0.2,
+                                                  color: Colors.grey))),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Container(
+                                            width: 20,
+                                            margin: EdgeInsets.only(left: 20),
+                                            child: Text('${index + 1}'),
                                           ),
-                                        )
-                                      ],
+                                          Container(
+                                            height: 60,
+                                            width: MediaQueryData.fromWindow(
+                                                        window)
+                                                    .size
+                                                    .width -
+                                                100,
+                                            margin: EdgeInsets.only(left: 10),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Container(
+                                                  margin:
+                                                      EdgeInsets.only(top: 7),
+                                                  height: 25,
+                                                  child: Text(
+                                                    _currentPlayList[index]
+                                                        .name,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 25,
+                                                  child: Text(
+                                                    _currentPlayList[index]
+                                                        .artNames,
+                                                    style: TextStyle(
+                                                        fontSize: 13,
+                                                        color: Colors.grey),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   );
                                 }),
@@ -181,5 +207,29 @@ class MorePageState extends State<MorePage> {
             ],
           )),
     );
+  }
+
+  _getCurrentPlayList() {
+    DBTool dbTool = DBTool();
+    dbTool.OpenPlayListDB().then((database) {
+      if (database != null) {
+        dbTool.getAllPlayList().then((value) {
+          if (value != null) {
+            _currentPlayList.clear();
+            List tempList = value;
+            for (Map tempInfo in tempList) {
+              String jsonStr = tempInfo['Info'];
+              var tempJson = convert.jsonDecode(jsonStr);
+              SongInfo songInfo =
+                  (tempJson is Map) ? SongInfo.fromJson(tempJson) : null;
+              if (songInfo != null) {
+                _currentPlayList.add(songInfo);
+              }
+            }
+            setState(() {});
+          }
+        });
+      }
+    });
   }
 }

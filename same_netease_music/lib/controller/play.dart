@@ -12,6 +12,7 @@ import 'package:dio/dio.dart';
 import '../model/PersonalizedInfo.dart';
 import '../Tool/contextTool.dart';
 import 'dart:async';
+import '../Tool/DBTool.dart';
 
 class PlayPage extends StatefulWidget {
   Map arguments;
@@ -120,6 +121,16 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
     } else {
       AudioControl.ShareValue().currentSongInfo = widget.arguments['song'];
     }
+
+    SongInfo playInfo = widget.arguments['song'];
+
+    DBTool dbTool = DBTool();
+    dbTool.OpenPlayListDB().then((database) {
+      if (database != null) {
+        dbTool.addPlayInfoForId(playInfo.id, playInfo.modelToJsonStr());
+      }
+    });
+
     _getMp3FromNet();
   }
 
@@ -135,7 +146,7 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
           child: Stack(
             children: [
               CachedNetworkImage(
-                imageUrl: widget.arguments['song'].ablumInfo.blurPicUrl == null
+                imageUrl: widget.arguments['song'].ablumInfo?.blurPicUrl == null
                     ? (_currentSongDetail?.ablumInfo?.blurPicUrl == null
                         ? ""
                         : _currentSongDetail.ablumInfo.blurPicUrl)
@@ -213,7 +224,7 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
                                     BorderRadius.all(Radius.circular(230 / 2)),
                                 image: DecorationImage(
                                     image: NetworkImage(widget.arguments['song']
-                                                .ablumInfo.blurPicUrl ==
+                                                .ablumInfo?.blurPicUrl ==
                                             null
                                         ? (_currentSongDetail
                                                     ?.ablumInfo?.blurPicUrl ==
@@ -431,7 +442,7 @@ class PlayState extends State<PlayPage> with TickerProviderStateMixin {
 
   @override
   void deactivate() {
-    Future.delayed(Duration(seconds: 1)).then((value) {
+    Future.delayed(Duration(milliseconds: 10)).then((value) {
       AudioControl.ShareValue().displayPlayStateToolWidget();
     });
     // TODO: implement deactivate
