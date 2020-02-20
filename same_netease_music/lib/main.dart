@@ -151,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage>
     return Scaffold(
       appBar: MyAppBar(
         child: Container(
+//          margin: EdgeInsets.only(top: 10),
           color: Colors.red,
           child: Column(
             mainAxisSize: MainAxisSize.max,
@@ -661,6 +662,7 @@ class AppbarState extends State<MyAppBar> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
+      color: Colors.red,
       height: widget.preferredSize.height,
       child: widget.child,
     );
