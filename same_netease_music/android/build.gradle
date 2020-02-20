@@ -3,11 +3,17 @@ buildscript {
     repositories {
 //        google()
 //        jcenter()
-        maven {
-            url 'https://maven.google.com'
-            // Alternative URL is 'https://dl.google.com/dl/android/maven2/'
-        }
-        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+//        maven {
+//            url 'https://maven.google.com'
+//            // Alternative URL is 'https://dl.google.com/dl/android/maven2/'
+//        }
+//        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        mavenCentral()
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+//        maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
+
     }
 
     dependencies {
@@ -20,11 +26,15 @@ allprojects {
     repositories {
 //        google()
 //        jcenter()
-        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        maven {
-            url 'https://maven.google.com'
-            // Alternative URL is 'https://dl.google.com/dl/android/maven2/'
-        }
+//        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+//        maven {
+//            url 'https://maven.google.com'
+//            // Alternative URL is 'https://dl.google.com/dl/android/maven2/'
+//        }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        mavenCentral()
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+//        maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
     }
 }
 
@@ -35,6 +45,7 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(':app')
 }
+subprojects { subproject -> afterEvaluate{ if((subproject.plugins.hasPlugin('android') || subproject.plugins.hasPlugin('android-library'))) { android { compileSdkVersion 28 } } } }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
