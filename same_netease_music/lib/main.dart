@@ -159,6 +159,7 @@ class _MyHomePageState extends State<MyHomePage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
+                color:Colors.red,
                 width: MediaQueryData.fromWindow(window).size.width,
                 height: 44,
                 child: Row(
@@ -641,8 +642,8 @@ class MyAppBar extends StatefulWidget implements PreferredSizeWidget {
   // TODO: implement preferredSize
   Size get preferredSize =>
       Size.fromHeight(MediaQueryData.fromWindow(window).padding.bottom > 0
-          ? kToolbarHeight + 20
-          : kToolbarHeight);
+          ? kToolbarHeight + 20+20
+          : kToolbarHeight+20);
 
   @override
   State<StatefulWidget> createState() {
